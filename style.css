@@ -84,7 +84,40 @@ main {
   padding: 1rem;
 }
 
+.group-card.official {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
 .group-card h3 { margin-top: 0; }
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.official-toggle {
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+}
+
+.official-badge {
+  background: var(--gold);
+  color: #3a2c02;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 0.3rem;
+}
 
 table.standings {
   width: 100%;
@@ -152,15 +185,6 @@ button.quick {
 
 button.quick:hover { border-color: var(--accent2); }
 
-.actual-toggle {
-  font-size: 0.75rem;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin-left: auto;
-}
-
 /* Third place table */
 table.standings.wide { max-width: 900px; margin: 0.5rem auto; }
 tr.pending-row td { color: var(--muted); font-style: italic; }
@@ -186,12 +210,22 @@ tr.pending-row td { color: var(--muted); font-style: italic; }
   color: var(--accent2);
 }
 
+.bracket-col .official-toggle {
+  justify-content: center;
+  margin: 0 auto 0.25rem;
+}
+
 .ko-match {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.5rem;
   font-size: 0.85rem;
+}
+
+.ko-match.official {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
 }
 
 .ko-team {

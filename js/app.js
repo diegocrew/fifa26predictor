@@ -8,24 +8,30 @@ const ALL_KO_IDS = [
   ...R16_IDS, ...QF_IDS, ...SF_IDS, FINAL_ID, THIRD_PLACE_MATCH_ID
 ];
 
+const KO_ROUND_KEYS = ['R32', 'R16', 'QF', 'SF', 'F', 'TP'];
+
 const KO_MATCHES = {};
-R32_TEMPLATE.forEach(m => { KO_MATCHES[m.id] = { round: 'Round of 32', a: m.a, b: m.b }; });
-R16_PAIRS.forEach((pair, i) => { KO_MATCHES[R16_IDS[i]] = { round: 'Round of 16', a: { t: 'M', id: pair[0] }, b: { t: 'M', id: pair[1] } }; });
-QF_PAIRS.forEach((pair, i) => { KO_MATCHES[QF_IDS[i]] = { round: 'Quarter-final', a: { t: 'M', id: pair[0] }, b: { t: 'M', id: pair[1] } }; });
-SF_PAIRS.forEach((pair, i) => { KO_MATCHES[SF_IDS[i]] = { round: 'Semi-final', a: { t: 'M', id: pair[0] }, b: { t: 'M', id: pair[1] } }; });
-KO_MATCHES[FINAL_ID] = { round: 'Final', a: { t: 'M', id: FINAL_PAIR[0] }, b: { t: 'M', id: FINAL_PAIR[1] } };
-KO_MATCHES[THIRD_PLACE_MATCH_ID] = { round: 'Third-place Match', a: { t: 'ML', id: FINAL_PAIR[0] }, b: { t: 'ML', id: FINAL_PAIR[1] } };
+R32_TEMPLATE.forEach(m => { KO_MATCHES[m.id] = { round: 'R32', a: m.a, b: m.b }; });
+R16_PAIRS.forEach((pair, i) => { KO_MATCHES[R16_IDS[i]] = { round: 'R16', a: { t: 'M', id: pair[0] }, b: { t: 'M', id: pair[1] } }; });
+QF_PAIRS.forEach((pair, i) => { KO_MATCHES[QF_IDS[i]] = { round: 'QF', a: { t: 'M', id: pair[0] }, b: { t: 'M', id: pair[1] } }; });
+SF_PAIRS.forEach((pair, i) => { KO_MATCHES[SF_IDS[i]] = { round: 'SF', a: { t: 'M', id: pair[0] }, b: { t: 'M', id: pair[1] } }; });
+KO_MATCHES[FINAL_ID] = { round: 'F', a: { t: 'M', id: FINAL_PAIR[0] }, b: { t: 'M', id: FINAL_PAIR[1] } };
+KO_MATCHES[THIRD_PLACE_MATCH_ID] = { round: 'TP', a: { t: 'ML', id: FINAL_PAIR[0] }, b: { t: 'ML', id: FINAL_PAIR[1] } };
 
 let state = null;
 
 function freshState() {
   const group = {};
   GROUP_LETTERS.forEach(g => {
-    group[g] = PAIR_INDEXES.map(() => ({ hs: null, as: null, actual: false }));
+    group[g] = PAIR_INDEXES.map(() => ({ hs: null, as: null }));
   });
   const ko = {};
-  ALL_KO_IDS.forEach(id => { ko[id] = { hs: null, as: null, actual: false, winner: null }; });
-  return { group, ko };
+  ALL_KO_IDS.forEach(id => { ko[id] = { hs: null, as: null, winner: null }; });
+  const groupActual = {};
+  GROUP_LETTERS.forEach(g => { groupActual[g] = false; });
+  const koRoundActual = {};
+  KO_ROUND_KEYS.forEach(r => { koRoundActual[r] = false; });
+  return { group, ko, groupActual, koRoundActual };
 }
 
 function loadState() {
@@ -36,9 +42,13 @@ function loadState() {
     const base = freshState();
     GROUP_LETTERS.forEach(g => {
       if (parsed.group && parsed.group[g]) base.group[g] = parsed.group[g];
+      if (parsed.groupActual && g in parsed.groupActual) base.groupActual[g] = !!parsed.groupActual[g];
     });
     ALL_KO_IDS.forEach(id => {
       if (parsed.ko && parsed.ko[id]) base.ko[id] = parsed.ko[id];
+    });
+    KO_ROUND_KEYS.forEach(r => {
+      if (parsed.koRoundActual && r in parsed.koRoundActual) base.koRoundActual[r] = !!parsed.koRoundActual[r];
     });
     return base;
   } catch (e) {
@@ -189,14 +199,17 @@ function renderGroups() {
           <button class="quick" data-pick="home">1-0</button>
           <button class="quick" data-pick="draw">Draw</button>
           <button class="quick" data-pick="away">0-1</button>
-          <label class="actual-toggle"><input type="checkbox" class="actual-check" ${m.actual ? 'checked' : ''}> Actual result</label>
         </div>
       </div>`;
     }).join('');
 
+    const isOfficial = state.groupActual[g];
     return `
-    <div class="group-card">
-      <h3>Group ${g}</h3>
+    <div class="group-card ${isOfficial ? 'official' : ''}">
+      <div class="group-header">
+        <h3>Group ${g} ${isOfficial ? '<span class="official-badge">OFFICIAL</span>' : ''}</h3>
+        <label class="official-toggle"><input type="checkbox" class="group-actual-check" data-group="${g}" ${isOfficial ? 'checked' : ''}> Official results</label>
+      </div>
       <table class="standings">
         <thead><tr><th></th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
         <tbody>${rows}</tbody>
@@ -205,19 +218,24 @@ function renderGroups() {
     </div>`;
   }).join('');
 
+  el.querySelectorAll('.group-actual-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      state.groupActual[cb.dataset.group] = cb.checked;
+      saveState(); renderAll();
+    });
+  });
+
   el.querySelectorAll('.match').forEach(matchEl => {
     const g = matchEl.dataset.group;
     const idx = Number(matchEl.dataset.idx);
     const rec = state.group[g][idx];
     const homeInput = matchEl.querySelector('.home-score');
     const awayInput = matchEl.querySelector('.away-score');
-    const actualCheck = matchEl.querySelector('.actual-check');
 
     const commit = () => { saveState(); renderAll(); };
 
     homeInput.addEventListener('input', () => { rec.hs = homeInput.value === '' ? null : Number(homeInput.value); commit(); });
     awayInput.addEventListener('input', () => { rec.as = awayInput.value === '' ? null : Number(awayInput.value); commit(); });
-    actualCheck.addEventListener('change', () => { rec.actual = actualCheck.checked; commit(); });
 
     matchEl.querySelectorAll('.quick').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -261,14 +279,14 @@ function renderThirdPlace() {
 }
 
 function renderKoMatch(id) {
-  const spec = KO_MATCHES[id];
   const { a, b } = getKOMatchupTeams(id);
   const rec = state.ko[id];
   const bothKnown = a.code && b.code;
   const winner = getKOWinner(id);
+  const isOfficial = state.koRoundActual[KO_MATCHES[id].round];
 
   return `
-    <div class="ko-match" data-id="${id}">
+    <div class="ko-match ${isOfficial ? 'official' : ''}" data-id="${id}">
       <div class="ko-team ${winner && winner === a.code ? 'winner' : ''} ${bothKnown ? 'clickable' : ''}" data-side="a">${teamLabel(a.code, a.label)}</div>
       <div class="ko-score-row">
         <input type="number" min="0" class="score ko-home" value="${rec.hs ?? ''}" placeholder="-" ${bothKnown ? '' : 'disabled'}>
@@ -276,30 +294,40 @@ function renderKoMatch(id) {
         <input type="number" min="0" class="score ko-away" value="${rec.as ?? ''}" placeholder="-" ${bothKnown ? '' : 'disabled'}>
       </div>
       <div class="ko-team ${winner && winner === b.code ? 'winner' : ''} ${bothKnown ? 'clickable' : ''}" data-side="b">${teamLabel(b.code, b.label)}</div>
-      <label class="actual-toggle"><input type="checkbox" class="actual-check" ${rec.actual ? 'checked' : ''} ${bothKnown ? '' : 'disabled'}> Actual result</label>
     </div>`;
 }
 
 function renderKnockouts() {
   const el = document.getElementById('knockout-view');
   const columns = [
-    { title: 'Round of 32', ids: R32_TEMPLATE.map(m => m.id) },
-    { title: 'Round of 16', ids: R16_IDS },
-    { title: 'Quarter-finals', ids: QF_IDS },
-    { title: 'Semi-finals', ids: SF_IDS },
-    { title: 'Final', ids: [FINAL_ID] },
-    { title: '3rd Place Match', ids: [THIRD_PLACE_MATCH_ID] }
+    { title: 'Round of 32', key: 'R32', ids: R32_TEMPLATE.map(m => m.id) },
+    { title: 'Round of 16', key: 'R16', ids: R16_IDS },
+    { title: 'Quarter-finals', key: 'QF', ids: QF_IDS },
+    { title: 'Semi-finals', key: 'SF', ids: SF_IDS },
+    { title: 'Final', key: 'F', ids: [FINAL_ID] },
+    { title: '3rd Place Match', key: 'TP', ids: [THIRD_PLACE_MATCH_ID] }
   ];
 
   el.innerHTML = `
     <p class="hint">Round of 32 slots fill in once the relevant groups are complete. Third-place team slotting uses a simplified rule (see README) rather than FIFA's full official permutation table.</p>
     <div class="bracket">
-      ${columns.map(col => `
+      ${columns.map(col => {
+        const isOfficial = state.koRoundActual[col.key];
+        return `
         <div class="bracket-col">
-          <h3>${col.title}</h3>
+          <h3>${col.title} ${isOfficial ? '<span class="official-badge">OFFICIAL</span>' : ''}</h3>
+          <label class="official-toggle"><input type="checkbox" class="round-actual-check" data-round="${col.key}" ${isOfficial ? 'checked' : ''}> Official results</label>
           ${col.ids.map(renderKoMatch).join('')}
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>`;
+
+  el.querySelectorAll('.round-actual-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      state.koRoundActual[cb.dataset.round] = cb.checked;
+      saveState(); renderAll();
+    });
+  });
 
   el.querySelectorAll('.ko-match').forEach(matchEl => {
     const id = Number(matchEl.dataset.id);
@@ -309,11 +337,9 @@ function renderKnockouts() {
 
     const homeInput = matchEl.querySelector('.ko-home');
     const awayInput = matchEl.querySelector('.ko-away');
-    const actualCheck = matchEl.querySelector('.actual-check');
 
     homeInput.addEventListener('input', () => { rec.hs = homeInput.value === '' ? null : Number(homeInput.value); commit(); });
     awayInput.addEventListener('input', () => { rec.as = awayInput.value === '' ? null : Number(awayInput.value); commit(); });
-    actualCheck.addEventListener('change', () => { rec.actual = actualCheck.checked; commit(); });
 
     matchEl.querySelectorAll('.ko-team.clickable').forEach(teamEl => {
       teamEl.addEventListener('click', () => {
