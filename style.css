@@ -198,9 +198,10 @@ tr.pending-row td { color: var(--muted); font-style: italic; }
 }
 
 .bracket-col {
-  min-width: 220px;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
   gap: 0.75rem;
 }
 
@@ -208,6 +209,14 @@ tr.pending-row td { color: var(--muted); font-style: italic; }
   text-align: center;
   font-size: 0.95rem;
   color: var(--accent2);
+}
+
+.bracket-col.center-col {
+  min-width: 180px;
+  background: rgba(250, 204, 21, 0.05);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 0.5rem;
 }
 
 .bracket-col .official-toggle {

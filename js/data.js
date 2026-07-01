@@ -69,13 +69,28 @@ const R32_TEMPLATE = [
 // Which group's winner each third-place slot faces (used to avoid a team meeting its own group winner).
 const THIRD_PLACE_SLOT_OPPONENT_GROUP = ['E', 'I', 'A', 'L', 'D', 'G', 'B', 'K'];
 
-// Standard sequential single-elimination progression from R32 -> R16 -> QF -> SF -> Final.
-const R16_PAIRS = [[73, 74], [75, 76], [77, 78], [79, 80], [81, 82], [83, 84], [85, 86], [87, 88]];
+// Real fixed bracket progression from R32 -> R16 -> QF -> SF -> Final, per the
+// official published bracket (confirmed 2026-07-01). This is NOT simple
+// sequential pairing of adjacent match ids - e.g. the Germany/Paraguay (M74)
+// winner meets the France/Sweden (M77) winner, not South Africa/Canada (M73).
+const R16_PAIRS = [[74, 77], [73, 75], [76, 78], [79, 80], [83, 84], [81, 82], [86, 88], [85, 87]];
 const R16_IDS = [89, 90, 91, 92, 93, 94, 95, 96];
-const QF_PAIRS = [[89, 90], [91, 92], [93, 94], [95, 96]];
+const QF_PAIRS = [[89, 90], [93, 94], [91, 92], [95, 96]];
 const QF_IDS = [97, 98, 99, 100];
 const SF_PAIRS = [[97, 98], [99, 100]];
 const SF_IDS = [101, 102];
 const FINAL_PAIR = [101, 102];
 const FINAL_ID = 103;
 const THIRD_PLACE_MATCH_ID = 104;
+
+// Left/right halves of the bracket (each half's R32 winners converge to one Final
+// finalist), in the vertical order shown on the official bracket graphic - used to
+// render the mirrored "spider" bracket layout instead of a single linear list.
+const R32_LEFT_IDS = [74, 77, 73, 75, 83, 84, 81, 82];
+const R32_RIGHT_IDS = [76, 78, 79, 80, 86, 88, 85, 87];
+const R16_LEFT_IDS = [89, 90, 93, 94];
+const R16_RIGHT_IDS = [91, 92, 95, 96];
+const QF_LEFT_IDS = [97, 98];
+const QF_RIGHT_IDS = [99, 100];
+const SF_LEFT_ID = 101;
+const SF_RIGHT_ID = 102;

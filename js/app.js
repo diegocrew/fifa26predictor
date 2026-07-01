@@ -337,24 +337,33 @@ function renderKoMatch(id) {
 
 function renderKnockouts() {
   const el = document.getElementById('knockout-view');
+
+  // Mirrored "spider" layout: Round of 32 starts on both outer edges and each
+  // half converges inward through R16 -> QF -> SF to the Final in the middle,
+  // matching the official bracket graphic's shape.
   const columns = [
-    { title: 'Round of 32', key: 'R32', ids: R32_TEMPLATE.map(m => m.id) },
-    { title: 'Round of 16', key: 'R16', ids: R16_IDS },
-    { title: 'Quarter-finals', key: 'QF', ids: QF_IDS },
-    { title: 'Semi-finals', key: 'SF', ids: SF_IDS },
-    { title: 'Final', key: 'F', ids: [FINAL_ID] },
-    { title: '3rd Place Match', key: 'TP', ids: [THIRD_PLACE_MATCH_ID] }
+    { title: 'Round of 32', key: 'R32', ids: R32_LEFT_IDS, showToggle: true },
+    { title: 'Round of 16', key: 'R16', ids: R16_LEFT_IDS, showToggle: true },
+    { title: 'Quarter-final', key: 'QF', ids: QF_LEFT_IDS, showToggle: true },
+    { title: 'Semi-final', key: 'SF', ids: [SF_LEFT_ID], showToggle: true },
+    { title: 'Final', key: 'F', ids: [FINAL_ID], showToggle: true },
+    { title: '3rd Place', key: 'TP', ids: [THIRD_PLACE_MATCH_ID], showToggle: true },
+    { title: 'Semi-final', key: 'SF', ids: [SF_RIGHT_ID], showToggle: false },
+    { title: 'Quarter-final', key: 'QF', ids: QF_RIGHT_IDS, showToggle: false },
+    { title: 'Round of 16', key: 'R16', ids: R16_RIGHT_IDS, showToggle: false },
+    { title: 'Round of 32', key: 'R32', ids: R32_RIGHT_IDS, showToggle: false }
   ];
 
   el.innerHTML = `
-    <p class="hint">Round of 32 slots fill in once the relevant groups are complete. Third-place team slotting uses a simplified rule (see README) rather than FIFA's full official permutation table.</p>
-    <div class="bracket">
+    <p class="hint">Round of 32 matchups and results are pinned to the real, official bracket (js/results.js) once you toggle a round "Official". Still-to-be-played matches show the correct real teams already, just without a score.</p>
+    <div class="bracket spider">
       ${columns.map(col => {
         const isOfficial = state.koRoundActual[col.key];
+        const centerClass = col.key === 'F' || col.key === 'TP' ? ' center-col' : '';
         return `
-        <div class="bracket-col">
+        <div class="bracket-col${centerClass}">
           <h3>${col.title} ${isOfficial ? '<span class="official-badge">OFFICIAL</span>' : ''}</h3>
-          <label class="official-toggle"><input type="checkbox" class="round-actual-check" data-round="${col.key}" ${isOfficial ? 'checked' : ''}> Official results</label>
+          ${col.showToggle ? `<label class="official-toggle"><input type="checkbox" class="round-actual-check" data-round="${col.key}" ${isOfficial ? 'checked' : ''}> Official results</label>` : ''}
           ${col.ids.map(renderKoMatch).join('')}
         </div>`;
       }).join('')}
@@ -369,8 +378,7 @@ function renderKnockouts() {
           const id = Number(idStr);
           const r = REAL_KO_RESULTS[id];
           if (KO_MATCHES[id].round === key && r) {
-            state.ko[id].hs = r.hs;
-            state.ko[id].as = r.as;
+            if (r.hs !== undefined) { state.ko[id].hs = r.hs; state.ko[id].as = r.as; }
             if (r.winner) state.ko[id].winner = r.winner;
           }
         });
