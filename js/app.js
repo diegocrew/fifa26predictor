@@ -18,6 +18,14 @@ SF_PAIRS.forEach((pair, i) => { KO_MATCHES[SF_IDS[i]] = { round: 'SF', a: { t: '
 KO_MATCHES[FINAL_ID] = { round: 'F', a: { t: 'M', id: FINAL_PAIR[0] }, b: { t: 'M', id: FINAL_PAIR[1] } };
 KO_MATCHES[THIRD_PLACE_MATCH_ID] = { round: 'TP', a: { t: 'ML', id: FINAL_PAIR[0] }, b: { t: 'ML', id: FINAL_PAIR[1] } };
 
+// Team codes whose real Round of 32 third-place slot is already confirmed (from REAL_KO_RESULTS).
+// Used so the generic slotting algorithm doesn't re-guess a team into a second, still-open match.
+const KNOWN_THIRD_PLACE_SLOTS = {};
+R32_TEMPLATE.forEach(m => {
+  const real = REAL_KO_RESULTS[m.id];
+  if (m.b.t === 'T' && real && real.bCode) KNOWN_THIRD_PLACE_SLOTS[real.bCode] = m.b.s;
+});
+
 let state = null;
 
 function freshState() {
@@ -111,14 +119,23 @@ function resolveThirdPlaceAssignment() {
   const rows = thirdPlaceRows().filter(r => r.complete);
   rows.sort((x, y) => y.pts - x.pts || y.gd - x.gd || y.gf - x.gf || x.group.localeCompare(y.group));
   const qualifiedGroups = rows.slice(0, 8).map(r => r.group);
-  const remaining = qualifiedGroups.slice();
+
   const assignment = new Array(8).fill(null);
+  const remaining = [];
+  qualifiedGroups.forEach(g => {
+    const code = computeStandings(g)[2].code;
+    const knownSlot = KNOWN_THIRD_PLACE_SLOTS[code];
+    if (knownSlot !== undefined) assignment[knownSlot] = code;
+    else remaining.push(g);
+  });
+
   for (let slot = 0; slot < 8; slot++) {
+    if (assignment[slot]) continue;
     let idx = remaining.findIndex(g => g !== THIRD_PLACE_SLOT_OPPONENT_GROUP[slot]);
     if (idx === -1) idx = 0;
-    assignment[slot] = remaining.splice(idx, 1)[0];
+    assignment[slot] = computeStandings(remaining.splice(idx, 1)[0])[2].code;
   }
-  return assignment.map(g => computeStandings(g)[2].code);
+  return assignment;
 }
 
 function resolveSpec(spec) {
@@ -147,6 +164,14 @@ function resolveSpec(spec) {
 }
 
 function getKOMatchupTeams(id) {
+  const round = KO_MATCHES[id].round;
+  const real = REAL_KO_RESULTS[id];
+  if (state.koRoundActual[round] && real && real.aCode && real.bCode) {
+    return {
+      a: { code: real.aCode, label: TEAMS[real.aCode] },
+      b: { code: real.bCode, label: TEAMS[real.bCode] }
+    };
+  }
   const spec = KO_MATCHES[id];
   return { a: resolveSpec(spec.a), b: resolveSpec(spec.b) };
 }
@@ -174,7 +199,7 @@ function teamLabel(code, fallbackLabel) {
 
 function renderGroups() {
   const el = document.getElementById('groups-view');
-  el.innerHTML = GROUP_LETTERS.map(g => {
+  const cards = GROUP_LETTERS.map(g => {
     const standings = computeStandings(g);
     const rows = standings.map((t, i) => `
       <tr class="${i < 2 ? 'qualifies' : ''}">
@@ -218,9 +243,19 @@ function renderGroups() {
     </div>`;
   }).join('');
 
+  el.innerHTML = `
+    <p class="hint">Toggle "Official results" on a group to auto-fill the real scores (where known) instead of typing them in yourself.</p>
+    <div class="groups-grid">${cards}</div>`;
+
   el.querySelectorAll('.group-actual-check').forEach(cb => {
     cb.addEventListener('change', () => {
-      state.groupActual[cb.dataset.group] = cb.checked;
+      const g = cb.dataset.group;
+      state.groupActual[g] = cb.checked;
+      if (cb.checked) {
+        (REAL_GROUP_RESULTS[g] || []).forEach((r, i) => {
+          if (r) { state.group[g][i].hs = r.hs; state.group[g][i].as = r.as; }
+        });
+      }
       saveState(); renderAll();
     });
   });
@@ -284,6 +319,8 @@ function renderKoMatch(id) {
   const bothKnown = a.code && b.code;
   const winner = getKOWinner(id);
   const isOfficial = state.koRoundActual[KO_MATCHES[id].round];
+  const real = REAL_KO_RESULTS[id];
+  const note = isOfficial && real && real.note ? `<div class="ko-note">${real.note}</div>` : '';
 
   return `
     <div class="ko-match ${isOfficial ? 'official' : ''}" data-id="${id}">
@@ -294,6 +331,7 @@ function renderKoMatch(id) {
         <input type="number" min="0" class="score ko-away" value="${rec.as ?? ''}" placeholder="-" ${bothKnown ? '' : 'disabled'}>
       </div>
       <div class="ko-team ${winner && winner === b.code ? 'winner' : ''} ${bothKnown ? 'clickable' : ''}" data-side="b">${teamLabel(b.code, b.label)}</div>
+      ${note}
     </div>`;
 }
 
@@ -324,7 +362,19 @@ function renderKnockouts() {
 
   el.querySelectorAll('.round-actual-check').forEach(cb => {
     cb.addEventListener('change', () => {
-      state.koRoundActual[cb.dataset.round] = cb.checked;
+      const key = cb.dataset.round;
+      state.koRoundActual[key] = cb.checked;
+      if (cb.checked) {
+        Object.keys(KO_MATCHES).forEach(idStr => {
+          const id = Number(idStr);
+          const r = REAL_KO_RESULTS[id];
+          if (KO_MATCHES[id].round === key && r) {
+            state.ko[id].hs = r.hs;
+            state.ko[id].as = r.as;
+            if (r.winner) state.ko[id].winner = r.winner;
+          }
+        });
+      }
       saveState(); renderAll();
     });
   });

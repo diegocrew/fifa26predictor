@@ -10,8 +10,19 @@ Play it live on GitHub Pages, or just open `index.html` in a browser.
 - **Group stage**: enter/predict scores for every match (or use the quick Win/Draw/Win buttons). Standings, goal difference, and points are calculated live.
 - **Best 3rd-placed teams**: the 8 best third-place finishers across all 12 groups are ranked automatically once every group is complete.
 - **Knockout bracket**: Round of 32 → Round of 16 → Quarter-finals → Semi-finals → Final (+ 3rd place match). Click a team's name to pick it as the winner and advance it. Bracket slots fill in automatically as group results and earlier rounds are decided.
-- **Predictions vs. real results**: every match has an "Actual result" checkbox. Use it to flag a score you've entered as the real outcome (as games are actually played) rather than just a guess — this is a manual flag/label only, since this is a static site with no live data feed.
+- **Predictions vs. real results**: every group and every knockout round has an "Official results" toggle. Turning it on auto-fills the real scores for that group/round from `js/results.js` (where known) instead of you typing them in, and marks the card with a gold "OFFICIAL" badge so it's visually distinct from your own guesses.
 - Everything is saved in your browser's local storage, so your bracket survives a page reload. "Reset All Predictions" clears everything.
+
+## Keeping results up to date
+
+`js/results.js` holds the real match data used by the "Official results" toggles:
+
+- `REAL_GROUP_RESULTS[group]` — an array of 6 `{ hs, as }` scores (or `null` if not played yet), in the fixed match order `[0v1, 0v2, 0v3, 1v2, 1v3, 2v3]` against the team order in `GROUPS[g]` in `js/data.js`.
+- `REAL_KO_RESULTS[matchId]` — `{ aCode, bCode, hs, as, winner, note }` for a completed knockout match. `aCode`/`bCode` pin down the actual two teams (needed for Round of 32 matches involving a third-place qualifier, since this app's own slot-assignment algorithm is a simplified approximation — see below — and isn't guaranteed to guess the same team FIFA's real draw did).
+
+This data isn't fetched live (this is a static site with no backend) — it only updates when someone edits `results.js` with scores they've personally confirmed from an official source.
+
+## Notes on accuracy
 
 ## Notes on accuracy
 
@@ -19,16 +30,3 @@ Play it live on GitHub Pages, or just open `index.html` in a browser.
 - The Round of 32 pairing skeleton (which group winner/runner-up plays which) follows the tournament's fixed "no redraws" bracket structure.
 - Slotting the 8 best third-placed teams into their Round of 32 matches uses a simplified rule (avoiding a team facing its own group's winner) rather than FIFA's full official 495-combination lookup table, since that table isn't reproduced here. Everything past that point (Round of 16 onward) follows standard sequential bracket progression.
 - Tiebreakers use points → goal difference → goals for, not the full official FIFA tiebreaker rules (head-to-head, disciplinary points, etc.).
-
-## Running it
-
-No build step — it's plain HTML/CSS/JS:
-
-```
-index.html
-style.css
-js/data.js   # teams, groups, bracket structure
-js/app.js    # state, standings, rendering
-```
-
-Just enable GitHub Pages on this repo (Settings → Pages → Deploy from branch) and it will serve directly.

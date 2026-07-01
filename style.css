@@ -71,7 +71,7 @@ main {
 }
 
 /* Groups */
-#groups-view:not([hidden]) {
+.groups-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   gap: 1rem;
@@ -226,6 +226,14 @@ tr.pending-row td { color: var(--muted); font-style: italic; }
 .ko-match.official {
   border-color: var(--gold);
   box-shadow: 0 0 0 1px var(--gold);
+}
+
+.ko-note {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 0.3rem;
+  font-style: italic;
 }
 
 .ko-team {
