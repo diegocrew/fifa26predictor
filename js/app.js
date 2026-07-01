@@ -423,6 +423,14 @@ function renderAll() {
     }
   }
 
+  // Re-rendering replaces the .bracket container's DOM, which otherwise resets its
+  // horizontal scroll to 0 on every click - jarring since the bracket is much wider
+  // than the viewport. Capture/restore scroll position across the re-render.
+  const bracketEl = document.querySelector('.bracket');
+  const bracketScrollLeft = bracketEl ? bracketEl.scrollLeft : 0;
+  const pageScrollX = window.scrollX;
+  const pageScrollY = window.scrollY;
+
   renderGroups();
   renderThirdPlace();
   renderKnockouts();
@@ -431,6 +439,10 @@ function renderAll() {
     const el = document.querySelector(restoreSelector);
     if (el) { el.focus(); const v = el.value; el.setSelectionRange(v.length, v.length); }
   }
+
+  const newBracketEl = document.querySelector('.bracket');
+  if (newBracketEl) newBracketEl.scrollLeft = bracketScrollLeft;
+  window.scrollTo(pageScrollX, pageScrollY);
 }
 
 function setupTabs() {
