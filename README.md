@@ -21,12 +21,3 @@ Play it live on GitHub Pages, or just open `index.html` in a browser.
 - `REAL_KO_RESULTS[matchId]` — `{ aCode, bCode, hs, as, winner, note }` for a completed knockout match. `aCode`/`bCode` pin down the actual two teams (needed for Round of 32 matches involving a third-place qualifier, since this app's own slot-assignment algorithm is a simplified approximation — see below — and isn't guaranteed to guess the same team FIFA's real draw did).
 
 This data isn't fetched live (this is a static site with no backend) — it only updates when someone edits `results.js` with scores they've personally confirmed from an official source.
-
-## Notes on accuracy
-
-## Notes on accuracy
-
-- Groups are based on the official December 2025 World Cup draw.
-- The Round of 32 pairing skeleton (which group winner/runner-up plays which) follows the tournament's fixed "no redraws" bracket structure.
-- Slotting the 8 best third-placed teams into their Round of 32 matches uses a simplified rule (avoiding a team facing its own group's winner) rather than FIFA's full official 495-combination lookup table, since that table isn't reproduced here. Everything past that point (Round of 16 onward) follows standard sequential bracket progression.
-- Tiebreakers use points → goal difference → goals for, not the full official FIFA tiebreaker rules (head-to-head, disciplinary points, etc.).

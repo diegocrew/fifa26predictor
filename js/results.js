@@ -1,9 +1,3 @@
-/* Real-world actual results, used to auto-fill scores when a group/round is
-   marked "Official results". null means not played yet / not confirmed.
-   Group match order matches PAIR_INDEXES: [0v1, 0v2, 0v3, 1v2, 1v3, 2v3]
-   against the team order in GROUPS[g] (js/data.js). Source: user-confirmed
-   official fixture/results list, cross-checked 2026-07-01. */
-
 const REAL_GROUP_RESULTS = {
   A: [{ hs: 2, as: 0 }, { hs: 1, as: 0 }, { hs: 3, as: 0 }, { hs: 1, as: 0 }, { hs: 1, as: 1 }, { hs: 2, as: 1 }],
   B: [{ hs: 2, as: 1 }, { hs: 4, as: 1 }, { hs: 1, as: 1 }, { hs: 1, as: 1 }, { hs: 6, as: 0 }, { hs: 3, as: 1 }],
@@ -37,8 +31,8 @@ const REAL_KO_RESULTS = {
   78: { aCode: 'CI', bCode: 'NO', hs: 1, as: 2, winner: 'NO' },
   79: { aCode: 'MX', bCode: 'EC', hs: 2, as: 0, winner: 'MX' },
   80: { aCode: 'ENG', bCode: 'CD', hs: 2, as: 1, winner: 'ENG' },
-  81: { aCode: 'US', bCode: 'BA' },
-  82: { aCode: 'BE', bCode: 'SN' },
+  81: { aCode: 'US', bCode: 'BA', hs: 2, as: 0, winner: 'US' },
+  82: { aCode: 'BE', bCode: 'SN', hs: 3, as: 2, winner: 'BE' },
   83: { aCode: 'PT', bCode: 'HR' },
   84: { aCode: 'ES', bCode: 'AT' },
   85: { aCode: 'CH', bCode: 'DZ' },

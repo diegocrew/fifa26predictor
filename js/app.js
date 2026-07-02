@@ -362,9 +362,13 @@ function renderKnockouts() {
         const centerClass = col.key === 'F' || col.key === 'TP' ? ' center-col' : '';
         return `
         <div class="bracket-col${centerClass}">
-          <h3>${col.title} ${isOfficial ? '<span class="official-badge">OFFICIAL</span>' : ''}</h3>
-          ${col.showToggle ? `<label class="official-toggle"><input type="checkbox" class="round-actual-check" data-round="${col.key}" ${isOfficial ? 'checked' : ''}> Official results</label>` : ''}
-          ${col.ids.map(renderKoMatch).join('')}
+          <div class="bracket-col-header">
+            <h3>${col.title} ${isOfficial ? '<span class="official-badge">OFFICIAL</span>' : ''}</h3>
+            <label class="official-toggle" style="${col.showToggle ? '' : 'visibility:hidden'}"><input type="checkbox" class="round-actual-check" data-round="${col.key}" ${isOfficial ? 'checked' : ''} ${col.showToggle ? '' : 'disabled tabindex="-1"'}> Official results</label>
+          </div>
+          <div class="bracket-col-matches">
+            ${col.ids.map(renderKoMatch).join('')}
+          </div>
         </div>`;
       }).join('')}
     </div>`;

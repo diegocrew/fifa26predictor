@@ -201,6 +201,16 @@ tr.pending-row td { color: var(--muted); font-style: italic; }
   min-width: 200px;
   display: flex;
   flex-direction: column;
+}
+
+.bracket-col-header {
+  flex: 0 0 auto;
+}
+
+.bracket-col-matches {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   justify-content: space-around;
   gap: 0.75rem;
 }
