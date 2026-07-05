@@ -21,7 +21,7 @@ const REAL_GROUP_RESULTS = {
 // the group stage is fully complete, the entire Round of 32 draw is already fixed and
 // known - hs/as/winner/note are only filled in for matches that have actually been
 // played; the rest just pin the two real teams so the bracket shows correctly ahead
-// of kickoff. Source: official bracket graphic, confirmed 2026-07-01.
+// of kickoff. Source: official bracket graphic, confirmed 2026-07-04.
 const REAL_KO_RESULTS = {
   73: { aCode: 'ZA', bCode: 'CA', hs: 0, as: 1, winner: 'CA' },
   74: { aCode: 'DE', bCode: 'PY', hs: 1, as: 1, winner: 'PY', note: 'Paraguay won 4-3 on penalties after extra time' },
@@ -33,10 +33,12 @@ const REAL_KO_RESULTS = {
   80: { aCode: 'ENG', bCode: 'CD', hs: 2, as: 1, winner: 'ENG' },
   81: { aCode: 'US', bCode: 'BA', hs: 2, as: 0, winner: 'US' },
   82: { aCode: 'BE', bCode: 'SN', hs: 3, as: 2, winner: 'BE' },
-  83: { aCode: 'PT', bCode: 'HR' },
-  84: { aCode: 'ES', bCode: 'AT' },
-  85: { aCode: 'CH', bCode: 'DZ' },
-  86: { aCode: 'AR', bCode: 'CV' },
-  87: { aCode: 'CO', bCode: 'GH' },
-  88: { aCode: 'AU', bCode: 'EG' }
+  83: { aCode: 'PT', bCode: 'HR', hs: 2, as: 1, winner: 'PT' },
+  84: { aCode: 'ES', bCode: 'AT', hs: 3, as: 0, winner: 'ES' },
+  85: { aCode: 'CH', bCode: 'DZ', hs: 2, as: 0, winner: 'CH' },
+  86: { aCode: 'AR', bCode: 'CV', hs: 3, as: 2, winner: 'AR' },
+  87: { aCode: 'CO', bCode: 'GH', hs: 1, as: 0, winner: 'CO' },
+  88: { aCode: 'AU', bCode: 'EG', hs: 1, as: 1, winner: 'EG', note: 'Egypt won 4-2 on penalties after extra time' },
+  89: { aCode: 'PY', bCode: 'FR', hs: 0, as: 1, winner: 'FR' },
+  90: { aCode: 'CA', bCode: 'MA', hs: 0, as: 3, winner: 'MA' }
 };
