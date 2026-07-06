@@ -21,7 +21,7 @@ const REAL_GROUP_RESULTS = {
 // the group stage is fully complete, the entire Round of 32 draw is already fixed and
 // known - hs/as/winner/note are only filled in for matches that have actually been
 // played; the rest just pin the two real teams so the bracket shows correctly ahead
-// of kickoff. Source: official bracket graphic, confirmed 2026-07-04.
+// of kickoff. Source: official bracket graphic, confirmed 2026-07-05.
 const REAL_KO_RESULTS = {
   73: { aCode: 'ZA', bCode: 'CA', hs: 0, as: 1, winner: 'CA' },
   74: { aCode: 'DE', bCode: 'PY', hs: 1, as: 1, winner: 'PY', note: 'Paraguay won 4-3 on penalties after extra time' },
@@ -40,5 +40,6 @@ const REAL_KO_RESULTS = {
   87: { aCode: 'CO', bCode: 'GH', hs: 1, as: 0, winner: 'CO' },
   88: { aCode: 'AU', bCode: 'EG', hs: 1, as: 1, winner: 'EG', note: 'Egypt won 4-2 on penalties after extra time' },
   89: { aCode: 'PY', bCode: 'FR', hs: 0, as: 1, winner: 'FR' },
-  90: { aCode: 'CA', bCode: 'MA', hs: 0, as: 3, winner: 'MA' }
+  90: { aCode: 'CA', bCode: 'MA', hs: 0, as: 3, winner: 'MA' },
+  91: { aCode: 'BR', bCode: 'NO', hs: 1, as: 2, winner: 'NO' }
 };
