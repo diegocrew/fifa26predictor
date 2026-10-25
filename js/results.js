@@ -41,5 +41,18 @@ const REAL_KO_RESULTS = {
   88: { aCode: 'AU', bCode: 'EG', hs: 1, as: 1, winner: 'EG', note: 'Egypt won 4-2 on penalties after extra time' },
   89: { aCode: 'PY', bCode: 'FR', hs: 0, as: 1, winner: 'FR' },
   90: { aCode: 'CA', bCode: 'MA', hs: 0, as: 3, winner: 'MA' },
-  91: { aCode: 'BR', bCode: 'NO', hs: 1, as: 2, winner: 'NO' }
+  91: { aCode: 'BR', bCode: 'NO', hs: 1, as: 2, winner: 'NO' },
+  92: { aCode: 'MX', bCode: 'ENG', hs: 2, as: 3, winner: 'ENG' },
+  93: { aCode: 'PT', bCode: 'ES', hs: 0, as: 1, winner: 'ES' },
+  94: { aCode: 'US', bCode: 'BE', hs: 1, as: 4, winner: 'BE' },
+  95: { aCode: 'AR', bCode: 'EG', hs: 3, as: 2, winner: 'AR' },
+  96: { aCode: 'CH', bCode: 'CO', hs: 0, as: 0, winner: 'CH', note: 'Switzerland won 4-3 on penalties after extra time' },
+  97: { aCode: 'FR', bCode: 'MA', hs: 2, as: 0, winner: 'FR' },
+  98: { aCode: 'ES', bCode: 'BE', hs: 2, as: 1, winner: 'ES' },
+  99: { aCode: 'NO', bCode: 'ENG', hs: 1, as: 2, winner: 'ENG', note: 'After extra time' },
+  100: { aCode: 'AR', bCode: 'CH', hs: 3, as: 1, winner: 'AR', note: 'After extra time' },
+  101: { aCode: 'FR', bCode: 'ES', hs: 0, as: 2, winner: 'ES' },
+  102: { aCode: 'ENG', bCode: 'AR', hs: 1, as: 2, winner: 'AR' },
+  103: { aCode: 'ES', bCode: 'AR', hs: 1, as: 0, winner: 'ES', note: 'After extra time - Spain are world champions' },
+  104: { aCode: 'FR', bCode: 'ENG', hs: 4, as: 6, winner: 'ENG' }
 };
